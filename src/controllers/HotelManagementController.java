@@ -47,10 +47,10 @@ public class HotelManagementController {
                     hm.deleteHotel();
                     break;
                 case "Search":
-                    Message.createInputDialog("Input search id(Hxx)");
+                    String str = Message.createInputDialog("Input search id(Hxx)");
                     hm.searchHotel();
 
-                    break;
+                    break; 
                 case "Show":
                     hm.displayHotelList();
                     HotelManagementView.jTextArea_result.setText(hm.hotelList.toString());

@@ -9,7 +9,7 @@ public class Program {
 
         HotelManagement hm = new HotelManagement();
 
-        hm.loadFromFile(Path.DATA);
+        hm.loadFromFile(Path.DATA_DAT);
 
         Menu menu = new Menu("Hotel Management System");
         menu.addNewOption("Adding new hotel");
@@ -45,7 +45,7 @@ public class Program {
                     hm.displayHotelList();
                     break;
                 case 7:
-                    hm.saveToFile(Path.DATA);
+                    hm.saveToFile(Path.DATA_DAT);
                     break;
                 case 8:
                     System.out.println("Goodbye!");

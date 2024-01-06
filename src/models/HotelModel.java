@@ -1,8 +1,10 @@
 package models;
 
+import java.io.Serializable;
+
 import utils.ConsoleColors;
 
-public class HotelModel {
+public class HotelModel implements Serializable {
     private String Hotel_id;
     private String Hotel_Name;
     private String Hotel_Room_Available;
