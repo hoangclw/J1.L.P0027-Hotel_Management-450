@@ -1,20 +1,20 @@
-package runtime;
+package views;
 
 import constants.Path;
-import models.HotelManagement;
+import controllers.HotelManagement;
 import models.Menu;
 
-public class Program {
+public class Main {
     public static void main(String[] args) {
 
         HotelManagement hm = new HotelManagement();
 
-        hm.loadFromFile(Path.DATA_DAT);
+        hm.loadFromFile(Path.URL);
 
         Menu menu = new Menu("Hotel Management System");
         menu.addNewOption("Adding new hotel");
         menu.addNewOption("Checking exists hotel");
-        menu.addNewOption("Upating Hotel information");
+        menu.addNewOption("Updating Hotel information");
         menu.addNewOption("Deleting Hotel");
         menu.addNewOption("Searching Hotel");
         menu.addNewOption("Display a hotel list");
@@ -45,10 +45,10 @@ public class Program {
                     hm.displayHotelList();
                     break;
                 case 7:
-                    hm.saveToFile(Path.DATA_DAT);
+                    hm.saveToFile(Path.URL);
                     break;
                 case 8:
-                    System.out.println("Goodbye!");
+                    hm.quit();
                     break;
             }
         } while (choice != 8);

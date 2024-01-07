@@ -1,31 +1,22 @@
-package models;
+package controllers;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.StringTokenizer;
 
-import constants.ConsoleMessage;
 import constants.Message;
 import constants.Regex;
+import models.HotelModel;
 import utils.ConsoleColors;
 import utils.FileHandler;
 import utils.Inputter;
+import utils.StringTools;
 
 public class HotelManagement {
 
     public static ArrayList<HotelModel> hotelList = new ArrayList<>();
 
     private ArrayList<HotelModel> searchList = new ArrayList<>();
-
-    ConsoleMessage cm = new ConsoleMessage();
-
-    private boolean isSearchCompleted = false;
 
     public HotelManagement() {
         // hotelList.add(new HotelModel("H01", "Seraton", 10,
@@ -46,41 +37,32 @@ public class HotelManagement {
     }
 
     public void addNewHotel() {
-        boolean isContinue = false;
-        boolean isExisted = false;
-        String hotel_id = null;
+        boolean isExisted;
+        String hotel_id;
         do {
             do {
                 isExisted = false; // reset isExisted
-                hotel_id = Inputter.getString(cm.INPUT_HOTEL_ID, cm.HOTEL_ID_MUST_BE_H_AND_2_DIGITS,
-                        Regex.HOTEL_ID).toUpperCase();
+                hotel_id = Inputter.getString(Message.INPUT_HOTEL_ID, Message.HOTEL_ID_MUST_BE_H_AND_2_DIGITS, Regex.HOTEL_ID).toUpperCase();
                 for (HotelModel hotel : hotelList) {
                     if (hotel.getHotel_id().equals(hotel_id)) {
                         isExisted = true;
-                        System.out.println(ConsoleColors.RED + cm.HOTEL_ID_IS_EXISTED
+                        System.out.println(ConsoleColors.RED + Message.HOTEL_ID_IS_EXISTED
                                 + ConsoleColors.RESET);
                         break;
                     }
                 }
             } while (isExisted);
 
-            String hotel_Name = Inputter.getString(cm.INPUT_HOTEL_NAME, cm.HOTEL_NAME_IS_REQUIRED);
-            String hotel_Room_Available = Inputter.getString(cm.INPUT_HOTEL_ROOM_AVAILABLE,
-                    cm.HOTEL_ROOM_AVAILABLE_IS_REQUIRED);
-            String hotel_Address = Inputter.getString(cm.INPUT_HOTEL_ADDRESS,
-                    cm.HOTEL_ADDRESS_IS_REQUIRED);
-            String hotel_Phone = Inputter.getString(cm.INPUT_HOTEL_PHONE,
-                    cm.HOTEL_PHONE_MUST_BE_10_DIGITS,
-                    Regex.HOTEL_PHONE); // check regex
-            String hotel_Rating = Inputter.getString(cm.INPUT_HOTEL_RATING,
-                    cm.HOTEL_RATING_MUST_BE_NUMBER_AND_STAR,
-                    Regex.HOTEL_RATING);
+            String hotel_Name = Inputter.getString(Message.INPUT_HOTEL_NAME, Message.HOTEL_NAME_MUST_BE_LETTER, Regex.HOTEL_NAME);
+//            String hotel_Room_Available = String.valueOf(Inputter.getAnInteger(Message.INPUT_HOTEL_ROOM_AVAILABLE, Message.HOTEL_ROOM_AVAILABLE_MUST_BE_NUMBER, 0, Integer.MAX_VALUE));
+            String hotel_Room_Available = Inputter.getString(Message.INPUT_HOTEL_ROOM_AVAILABLE, Message.HOTEL_ROOM_AVAILABLE_MUST_BE_NUMBER, Regex.HOTEL_ROOM_AVAILABLE);
+            String hotel_Address = StringTools.formatString(Inputter.getString(Message.INPUT_HOTEL_ADDRESS, Message.HOTEL_ADDRESS_MUST_NOT_CONTAIN_SPECIAL_CHARACTER, Regex.HOTEL_ADDRESS));
+            String hotel_Phone = Inputter.getString(Message.INPUT_HOTEL_PHONE, Message.HOTEL_PHONE_MUST_BE_10_DIGITS, Regex.HOTEL_PHONE); // check regex
+            String hotel_Rating = Inputter.getString(Message.INPUT_HOTEL_RATING, Message.HOTEL_RATING_MUST_BE_NUMBER_AND_STAR, Regex.HOTEL_RATING);
 
-            HotelModel hotel = new HotelModel(hotel_id, hotel_Name, hotel_Room_Available,
-                    hotel_Address,
-                    hotel_Phone, hotel_Rating);
+            HotelModel hotel = new HotelModel(hotel_id, hotel_Name, hotel_Room_Available, hotel_Address, hotel_Phone, hotel_Rating);
             hotelList.add(hotel);
-            System.out.println(cm.ADD_NEW_HOTEL_SUCCESSFULLY);
+            System.out.println(Message.ADD_NEW_HOTEL_SUCCESSFULLY);
         } while (getUserChoice());
     }
 
@@ -117,36 +99,32 @@ public class HotelManagement {
 
     public void checkExistsHotel() {
         do {
-            String hotel_id = Inputter.getString(cm.INPUT_HOTEL_ID,
-                    cm.HOTEL_ID_MUST_BE_H_AND_2_DIGITS,
-                    Regex.HOTEL_ID);
+            String hotel_id = Inputter.getString(Message.INPUT_HOTEL_ID, Message.HOTEL_ID_MUST_BE_H_AND_2_DIGITS, Regex.HOTEL_ID);
             HotelModel hotelModel = this.searchHotelByID(hotel_id);
             if (hotelModel == null) {
-                System.out.println(cm.HOTEL_ID_IS_NOT_EXISTED);
+                System.out.println(ConsoleColors.RED + Message.HOTEL_ID_IS_NOT_EXISTED + ConsoleColors.RESET);
             } else {
-                System.out.println(
-                        ConsoleColors.RED + cm.HOTEL_ID_IS_EXISTED + ConsoleColors.RESET);
+                System.out.println(Message.HOTEL_ID_IS_EXISTED);
             }
-
         } while (getUserChoice());
     }
 
     // after updating, the program return to the main screen
     public void updateHotel() {
-        String hotel_id = Inputter.getString(cm.INPUT_HOTEL_ID, cm.HOTEL_ID_MUST_BE_H_AND_2_DIGITS,
+        String hotel_id = Inputter.getString(Message.INPUT_HOTEL_ID, Message.HOTEL_ID_MUST_BE_H_AND_2_DIGITS,
                 Regex.HOTEL_ID);
         HotelModel hotel = this.searchHotelByID(hotel_id);
         if (hotel == null) {
-            System.out.println(cm.HOTEL_ID_IS_NOT_EXISTED);
+            System.out.println(Message.HOTEL_ID_IS_NOT_EXISTED);
         } else {
             System.out.println("Before updating: ");
             hotel.showInfo();
             // các field dữ liệu update có thể rỗng
-            String hotel_Name = Inputter.getString(cm.INPUT_HOTEL_NAME);
-            String hotel_Room_Available = Inputter.getString(cm.INPUT_HOTEL_ROOM_AVAILABLE);
-            String hotel_Address = Inputter.getString(cm.INPUT_HOTEL_ADDRESS);
-            String hotel_Phone = Inputter.getString(cm.INPUT_HOTEL_PHONE);
-            String hotel_Rating = Inputter.getString(cm.INPUT_HOTEL_RATING);
+            String hotel_Name = Inputter.getString(Message.INPUT_HOTEL_NAME);
+            String hotel_Room_Available = Inputter.getString(Message.INPUT_HOTEL_ROOM_AVAILABLE);
+            String hotel_Address = Inputter.getString(Message.INPUT_HOTEL_ADDRESS);
+            String hotel_Phone = Inputter.getString(Message.INPUT_HOTEL_PHONE);
+            String hotel_Rating = Inputter.getString(Message.INPUT_HOTEL_RATING);
 
             // If new information is blank, then not change old information.
             if (hotel_Name.isEmpty()) {
@@ -180,28 +158,25 @@ public class HotelManagement {
             }
             System.out.println("After updating: ");
             hotel.showInfo();
-            System.out.println(cm.UPDATE_HOTEL_SUCCESSFULLY);
+            System.out.println(Message.UPDATE_HOTEL_SUCCESSFULLY);
         }
     }
 
     // after deleting, the program return to the main screen
     public void deleteHotel() {
-
-        String hotel_id = Inputter.getString(cm.INPUT_HOTEL_ID, cm.HOTEL_ID_MUST_BE_H_AND_2_DIGITS,
-                Regex.HOTEL_ID);
+        String hotel_id = Inputter.getString(Message.INPUT_HOTEL_ID, Message.HOTEL_ID_MUST_BE_H_AND_2_DIGITS, Regex.HOTEL_ID);
         // tìm vị trí của hotel cần xóa
         HotelModel hotelModel = this.searchHotelByID(hotel_id);
         if (hotelModel == null) {
-            System.out.println(cm.DELETE_HOTEL_FAILED);
+            System.out.println(Message.DELETE_HOTEL_FAILED);
         } else {
             hotelModel.showInfo();
             if (!getUserConfirmation()) {
                 return;
             }
             hotelList.remove(hotelModel);
-            System.out.println(cm.DELETE_HOTEL_SUCCESSFULLY);
+            System.out.println(Message.DELETE_HOTEL_SUCCESSFULLY);
         }
-
     }
 
     public void searchHotel() {
@@ -212,9 +187,10 @@ public class HotelManagement {
             switch (choice) {
                 // search by id
                 case 1:
-                    String hotel_id = Inputter.getString(cm.INPUT_HOTEL_ID, cm.HOTEL_NAME_IS_REQUIRED);
+                    String hotel_id = Inputter.getString(Message.INPUT_HOTEL_ID, Message.HOTEL_NAME_IS_REQUIRED);
                     searchList = this.searchHotelListByID(hotel_id);
                     if (searchList.isEmpty()) {
+                        System.out.println(Message.HOTEL_ID_IS_NOT_EXISTED);
                     } else {
                         for (HotelModel item : searchList) {
                             item.showInfo();
@@ -223,9 +199,12 @@ public class HotelManagement {
                     break;
                 // search by name
                 case 2:
-                    String hotel_Name = Inputter.getString(cm.INPUT_HOTEL_NAME, cm.HOTEL_NAME_IS_REQUIRED);
+                    String hotel_Name = Inputter.getString(Message.INPUT_HOTEL_NAME, Message.HOTEL_NAME_IS_REQUIRED);
                     for (HotelModel item : hotelList) {
-                        if (item.getHotel_Name().equalsIgnoreCase(hotel_Name)) {
+                        if(!item.getHotel_Name().equalsIgnoreCase(hotel_Name)){
+                            System.out.println(Message.HOTEL_NAME_IS_NOT_EXISTED);
+                        }else{
+                            System.out.println(Message.HOTEL_NAME_IS_EXISTED);
                             item.showInfo();
                             break;
                             // sử dụng break ở đây để thoát khỏi vòng lặp gần nhất
@@ -285,7 +264,7 @@ public class HotelManagement {
      * return false;
      * }
      * }
-     * 
+     *
      * public boolean saveToFile(String url) {
      * if (hotelList.isEmpty()) {
      * System.out.println("Hotel list is empty");
@@ -330,20 +309,14 @@ public class HotelManagement {
     }
 
     public boolean getUserChoice() {
-        return Inputter.getYesNo(cm.DO_YOU_WANT_TO_CONTINUE, cm.PLESE_INPUT_Y_OR_N)
+        return Inputter.getYesNo(Message.DO_YOU_WANT_TO_CONTINUE, Message.PLEASE_INPUT_Y_OR_N)
                 .toLowerCase()
                 .equals("y");
     }
 
     public boolean getUserConfirmation() {
-        return Inputter.getYesNo(cm.DO_YOU_WANT_TO_DELETE, cm.PLESE_INPUT_Y_OR_N)
+        return Inputter.getYesNo(Message.DO_YOU_WANT_TO_DELETE, Message.PLEASE_INPUT_Y_OR_N)
                 .toLowerCase()
                 .equals("y");
     }
-
-    public void exitProgram() {
-        System.out.println("Good bye");
-        Message.createConfirmationMsg("Do you want to continue?");
-    }
-
 }
