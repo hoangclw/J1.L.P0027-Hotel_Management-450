@@ -2,17 +2,22 @@ package utils;
 
 import java.io.*;
 import java.util.ArrayList;
+
+import controllers.HotelManagement;
 import models.HotelModel;
 
 public class FileHandler {
-    public static boolean serialize(ArrayList<HotelModel> hotelList, String filename) {
+    // method: serialize for writing
+    public static boolean serialize(String fName) {
         try {
-            FileOutputStream fileOut = new FileOutputStream(filename);
-            ObjectOutputStream out = new ObjectOutputStream(fileOut);
-            out.writeObject(hotelList);
+            FileOutputStream fOut = new FileOutputStream(fName);
+            ObjectOutputStream out = new ObjectOutputStream(fOut);
+            for(HotelModel item: HotelManagement.hotelList){
+                out.writeObject(item);
+            }
             out.close();
-            fileOut.close();
-            System.out.println("Serialized data is saved in " + filename);
+            fOut.close();
+            System.out.println("Serialized data is saved in " + fName);
             return true;
         } catch (IOException e) {
             System.out.println("Serialization failed: " + e.getMessage());
@@ -20,15 +25,16 @@ public class FileHandler {
         }
     }
 
-    public static ArrayList<HotelModel> deserialize(String filename) {
+    // method: deserialize for reading
+    public static ArrayList<HotelModel> deserialize(String fName) {
         ArrayList<HotelModel> hotelList = new ArrayList<>();
         try {
-            FileInputStream fileIn = new FileInputStream(filename);
-            ObjectInputStream in = new ObjectInputStream(fileIn);
+            FileInputStream fIn = new FileInputStream(fName);
+            ObjectInputStream in = new ObjectInputStream(fIn);
             hotelList = (ArrayList<HotelModel>) in.readObject();
             in.close();
-            fileIn.close();
-            System.out.println("Deserialized data is loaded from " + filename);
+            fIn.close();
+            System.out.println("Deserialized data is loaded from " + fName);
         } catch (IOException | ClassNotFoundException e) {
             System.out.println("Deserialization failed: " + e.getMessage());
         }

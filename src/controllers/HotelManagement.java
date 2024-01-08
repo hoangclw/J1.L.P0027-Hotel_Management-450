@@ -1,5 +1,9 @@
 package controllers;
 
+import java.io.EOFException;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.ObjectInputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -296,12 +300,45 @@ public class HotelManagement {
      */
 
     public boolean loadFromFile(String url) {
-        hotelList = FileHandler.deserialize(url);
-        return hotelList != null;
+//        hotelList.clear();
+//        hotelList = FileHandler.deserialize(url);
+//        return hotelList != null;
+        if(hotelList.size() > 0){
+            hotelList.clear();
+        }
+        try{
+            File f = new File(url);
+            if(!f.exists()){
+                return false;
+            }
+            FileInputStream fi = new FileInputStream(f);
+            ObjectInputStream fo = new ObjectInputStream(fi);
+            HotelModel hotel;
+            while (true) {
+                try {
+                    hotel = (HotelModel) fo.readObject();
+                    if (hotel != null) {
+                        hotelList.add(hotel);
+                    } else {
+                        break; // Exit the loop when EOFException is caught
+                    }
+                } catch (EOFException eof) {
+                    break; // Reached end of file
+                }
+            }
+            fo.close();
+            fi.close();
+            System.out.println("Deserialized data is loaded from " + url);
+            return true;
+        }catch (Exception e){
+            System.out.println("Error read file" + e.getMessage());
+            return false;
+        }
+
     }
 
     public boolean saveToFile(String url) {
-        return FileHandler.serialize(hotelList, url);
+        return FileHandler.serialize(url);
     }
 
     public void quit() {
