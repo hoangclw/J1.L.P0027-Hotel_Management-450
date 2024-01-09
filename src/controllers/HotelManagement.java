@@ -310,17 +310,9 @@ public class HotelManagement {
             FileInputStream fi = new FileInputStream(f);
             ObjectInputStream fo = new ObjectInputStream(fi);
             HotelModel hotel;
-            while (true) {
-                try {
-                    hotel = (HotelModel) fo.readObject();
-                    if (hotel != null) {
-                        hotelList.add(hotel);
-                    } else {
-                        break; // Exit the loop when EOFException is caught
-                    }
-                } catch (EOFException eof) {
-                    break; // Reached end of file
-                }
+            for(HotelModel item: hotelList){
+                hotel = (HotelModel) fo.readObject();
+                hotelList.add(hotel);
             }
             fo.close();
             fi.close();
