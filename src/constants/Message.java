@@ -16,12 +16,16 @@ public class Message {
     public static final String HOTEL_ROOM_AVAILABLE_MUST_BE_NUMBER = "Hotel room available must be number";
     public static final String HOTEL_ADDRESS_MUST_NOT_CONTAIN_SPECIAL_CHARACTER = "Hotel address must not contain special character (except comma)";
 
-    public static final String HOTEL_ID_IS_NOT_EXISTED = "Hotel id is not existed";
+    public static final String EXIST_HOTEL = "Exist Hotel";
+    public static final String NO_HOTEL_FOUND = "No Hotel Found!";
+
+    public static final String HOTEL_DOES_NOT_EXIST = "Hotel does not exist";
     public static final String HOTEL_ID_IS_EXISTED = "Hotel id is existed";
     public static final String HOTEL_NAME_IS_EXISTED = "Hotel name is existed";
     public static final String HOTEL_NAME_IS_NOT_EXISTED = "Hotel name is not existed";
 
     public static final String ADD_NEW_HOTEL_SUCCESSFULLY = "Add new hotel successfully";
+    public static final String ADD_NEW_HOTEL_FAILED = "Add new hotel failed";
     public static final String UPDATE_HOTEL_SUCCESSFULLY = "Update hotel successfully";
     public static final String DELETE_HOTEL_SUCCESSFULLY = "Delete hotel successfully";
     public static final String DELETE_HOTEL_FAILED = "Delete hotel failed";

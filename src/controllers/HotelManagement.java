@@ -4,6 +4,7 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.StringTokenizer;
 
 import constants.Message;
 import constants.Regex;
@@ -14,28 +15,13 @@ import utils.StringTools;
 
 public class HotelManagement {
 
-    public static ArrayList<HotelModel> hotelList = new ArrayList<>();
+    public static ArrayList<HotelModel> hotelList = new ArrayList<HotelModel>();
 
-    private ArrayList<HotelModel> userActionlist = new ArrayList<>();
+    private ArrayList<HotelModel> userActionList = new ArrayList<HotelModel>();
 
-    private ArrayList<HotelModel> searchList = new ArrayList<>();
+    private ArrayList<HotelModel> searchList = new ArrayList<HotelModel>();
 
     public HotelManagement() {
-        // hotelList.add(new HotelModel("H01", "Seraton", 10,
-        // "189 Ung Van Khiem, Ward 25, Binh Thanh District, Ho Chi Minh City",
-        // "0911796099",
-        // "4 stars"));
-        // hotelList.add(new HotelModel("H02", "VinStar", 5,
-        // "200 Ung Van Khiem, Ward 25, Binh Thanh District, Ho Chi Minh City",
-        // "0918940111",
-        // "5 stars"));
-        // hotelList.add(new HotelModel("H03", "OutString", 7,
-        // "300 D1, Ward 24, Binh Thanh District, Ho Chi Minh City", "0988940222", "6
-        // stars"));
-        // hotelList.add(new HotelModel("H04", "Betigar", 8,
-        // "189 Duong Quang Ham, Ward 5, Go Vap District, Ho Chi Minh City",
-        // "0977940100",
-        // "3 stars"));
     }
 
     public void addNewHotel() {
@@ -47,11 +33,10 @@ public class HotelManagement {
                 hotel_id = Inputter
                         .getString(Message.INPUT_HOTEL_ID, Message.HOTEL_ID_MUST_BE_H_AND_2_DIGITS, Regex.HOTEL_ID)
                         .toUpperCase();
-                for (HotelModel hotel : hotelList) {
+                for (HotelModel hotel : userActionList) {
                     if (hotel.getHotel_id().equals(hotel_id)) {
                         isExisted = true;
-                        System.out.println(ConsoleColors.RED + Message.HOTEL_ID_IS_EXISTED
-                                + ConsoleColors.RESET);
+                        System.out.println(Message.HOTEL_ID_IS_EXISTED + "\n" + Message.ADD_NEW_HOTEL_FAILED);
                         break;
                     }
                 }
@@ -73,42 +58,38 @@ public class HotelManagement {
 
             HotelModel hotel = new HotelModel(hotel_id, hotel_Name, hotel_Room_Available, hotel_Address, hotel_Phone,
                     hotel_Rating);
-            // add to userActionlist
-            userActionlist.add(hotel);
+            // add to userActionList
+            // hotelList.add(hotel);
+            userActionList.add(hotel);
             System.out.println(Message.ADD_NEW_HOTEL_SUCCESSFULLY);
         } while (getUserChoice());
     }
 
-    public int searchHotelIndexId(String keyId) {
-        for (int i = 0; i < hotelList.size(); i++) {
-            if (hotelList.get(i).getHotel_id().equals(keyId)) {
+    // search trong hotelList gốc
+    public int searchHotelIndexId(ArrayList<HotelModel> hotel, String keyId) {
+        for (int i = 0; i < hotel.size(); i++) {
+            if (hotel.get(i).getHotel_id().equals(keyId)) {
                 return i;
             }
         }
         return -1;
     }
 
-    public HotelModel searchHotelByID(String keyId) {
-        int pos = this.searchHotelIndexId(keyId);
-        return pos == -1 ? null : hotelList.get(pos);
+    public HotelModel searchHotelByID(ArrayList<HotelModel> hotel, String keyId) {
+        int pos = this.searchHotelIndexId(hotel, keyId);
+        return pos == -1 ? null : hotel.get(pos);
     }
 
     // tìm trong 2 mảng hotelList và searchList
     public ArrayList<HotelModel> searchHotelListByID(String keyId) {
         searchList.clear(); // reset searchList
         // tìm trong hotelList
-        for (HotelModel hotelModel : hotelList) {
-            if (hotelModel.getHotel_id().contains(keyId)) {
-                searchList.add(hotelModel);
+        for (HotelModel hotel : hotelList) {
+            if (hotel.getHotel_id().contains(keyId)) {
+                searchList.add(hotel);
             }
         }
-        // tìm trong searchList
-        for (HotelModel hotelModel : userActionlist) {
-            if (hotelModel.getHotel_id().contains(keyId)) {
-                searchList.add(hotelModel);
-            }
-        }
-        Comparator orderById = new Comparator<HotelModel>() {
+        Comparator<HotelModel> orderById = new Comparator<HotelModel>() {
             @Override
             public int compare(HotelModel o1, HotelModel o2) {
                 return o2.getHotel_id().compareTo(o1.getHotel_id()); // descending
@@ -122,11 +103,11 @@ public class HotelManagement {
         do {
             String hotel_id = Inputter.getString(Message.INPUT_HOTEL_ID, Message.HOTEL_ID_MUST_BE_H_AND_2_DIGITS,
                     Regex.HOTEL_ID);
-            HotelModel hotelModel = this.searchHotelByID(hotel_id);
+            HotelModel hotelModel = this.searchHotelByID(hotelList, hotel_id); // search trong hotelList gốc
             if (hotelModel == null) {
-                System.out.println(ConsoleColors.RED + Message.HOTEL_ID_IS_NOT_EXISTED + ConsoleColors.RESET);
+                System.out.println(Message.NO_HOTEL_FOUND);
             } else {
-                System.out.println(Message.HOTEL_ID_IS_EXISTED);
+                System.out.println(Message.EXIST_HOTEL);
             }
         } while (getUserChoice());
     }
@@ -135,12 +116,10 @@ public class HotelManagement {
     public void updateHotel() {
         String hotel_id = Inputter.getString(Message.INPUT_HOTEL_ID, Message.HOTEL_ID_MUST_BE_H_AND_2_DIGITS,
                 Regex.HOTEL_ID);
-        HotelModel hotel = this.searchHotelByID(hotel_id);
+        HotelModel hotel = this.searchHotelByID(userActionList, hotel_id);
         if (hotel == null) {
-            System.out.println(Message.HOTEL_ID_IS_NOT_EXISTED);
+            System.out.println(Message.HOTEL_DOES_NOT_EXIST);
         } else {
-            System.out.println("Before updating: ");
-            hotel.showInfo();
             // các field dữ liệu update có thể rỗng
             String hotel_Name = Inputter.getString(Message.INPUT_HOTEL_NAME);
             String hotel_Room_Available = Inputter.getString(Message.INPUT_HOTEL_ROOM_AVAILABLE);
@@ -180,7 +159,6 @@ public class HotelManagement {
             }
             System.out.println("After updating: ");
             hotel.showInfo();
-            System.out.println(Message.UPDATE_HOTEL_SUCCESSFULLY);
         }
     }
 
@@ -190,15 +168,15 @@ public class HotelManagement {
                 Regex.HOTEL_ID);
         // tìm vị trí của hotel cần xóa
         // tìm trong cái mảng gốc
-        HotelModel hotelModel = this.searchHotelByID(hotel_id);
-        if (hotelModel == null) {
+        HotelModel hotel = this.searchHotelByID(hotelList, hotel_id);
+        if (hotel == null) {
             System.out.println(Message.DELETE_HOTEL_FAILED);
         } else {
-            hotelModel.showInfo();
+            hotel.showInfo();
             if (!getUserConfirmation()) {
                 return;
             }
-            hotelList.remove(hotelModel);
+            userActionList.remove(hotel);
             System.out.println(Message.DELETE_HOTEL_SUCCESSFULLY);
         }
     }
@@ -211,10 +189,10 @@ public class HotelManagement {
             switch (choice) {
                 // search by id
                 case 1:
-                    String hotel_id = Inputter.getString(Message.INPUT_HOTEL_ID, Message.HOTEL_NAME_IS_REQUIRED);
-                    searchList = this.searchHotelListByID(hotel_id);
+                    String hotelId = Inputter.getString(Message.INPUT_HOTEL_ID, Message.HOTEL_NAME_IS_REQUIRED);
+                    searchList = this.searchHotelListByID(hotelId); // search trong hotelList (search)
                     if (searchList.isEmpty()) {
-                        System.out.println(Message.HOTEL_ID_IS_NOT_EXISTED);
+                        System.out.println(Message.NO_HOTEL_FOUND);
                     } else {
                         for (HotelModel item : searchList) {
                             item.showInfo();
@@ -223,9 +201,9 @@ public class HotelManagement {
                     break;
                 // search by name
                 case 2:
-                    String hotel_Name = Inputter.getString(Message.INPUT_HOTEL_NAME, Message.HOTEL_NAME_IS_REQUIRED);
+                    String hotelName = Inputter.getString(Message.INPUT_HOTEL_NAME, Message.HOTEL_NAME_IS_REQUIRED);
                     for (HotelModel item : hotelList) {
-                        if (!item.getHotel_Name().equalsIgnoreCase(hotel_Name)) {
+                        if (!item.getHotel_Name().equalsIgnoreCase(hotelName)) {
                             System.out.println(Message.HOTEL_NAME_IS_NOT_EXISTED);
                         } else {
                             System.out.println(Message.HOTEL_NAME_IS_EXISTED);
@@ -246,7 +224,7 @@ public class HotelManagement {
             System.out.println("Hotel list is empty");
             return;
         }
-        Comparator orderByName = new Comparator<HotelModel>() {
+        Comparator<HotelModel> orderByName = new Comparator<HotelModel>() {
             @Override
             public int compare(HotelModel o1, HotelModel o2) {
                 return o2.getHotel_Name().compareTo(o1.getHotel_Name());
@@ -259,6 +237,11 @@ public class HotelManagement {
                 "Rating" + ConsoleColors.RESET);
         System.out.println(str);
         for (HotelModel item : hotelList) {
+            item.showInfo();
+        }
+
+        System.out.println("Test UserActionList: ");
+        for (HotelModel item : userActionList) {
             item.showInfo();
         }
         // return str + "\n" + hotelList.toString();
@@ -319,7 +302,7 @@ public class HotelManagement {
      * }
      */
 
-    public boolean loadFromFile(String url) {
+    public boolean loadFromFileObj(String url) {
         // hotelList.clear();
         // hotelList = FileHandler.deserialize(url);
         // return hotelList != null;
@@ -349,7 +332,7 @@ public class HotelManagement {
 
     }
 
-    public boolean saveToFile(String url) {
+    public boolean saveToFileObj(String url) {
         try {
             FileOutputStream fOut = new FileOutputStream(url);
             ObjectOutputStream out = new ObjectOutputStream(fOut);
@@ -362,6 +345,66 @@ public class HotelManagement {
             return true;
         } catch (IOException e) {
             System.out.println("Serialization failed: " + e.getMessage());
+            return false;
+        }
+    }
+
+    public boolean readFromFileTxt(String url) {
+        try {
+            File file = new File(url);
+            if (!file.exists()) {
+                file.createNewFile();
+            }
+            BufferedReader br = new BufferedReader(new FileReader(url));
+            String line = br.readLine();
+            while (line != null) {
+                StringTokenizer stk = new StringTokenizer(line, "-");
+                String hotel_id = stk.nextToken().trim();
+                String hotel_Name = stk.nextToken().trim();
+                String hotel_Room_Available = stk.nextToken().trim();
+                String hotel_Address = stk.nextToken().trim();
+                String hotel_Phone = stk.nextToken().trim();
+                String hotel_Rating = stk.nextToken().trim();
+                HotelModel hotel = new HotelModel(hotel_id, hotel_Name, hotel_Room_Available, hotel_Address,
+                        hotel_Phone, hotel_Rating);
+                hotelList.add(hotel);
+
+                line = br.readLine();
+            }
+            userActionList = new ArrayList<>(hotelList); // copy hotelList to userActionList
+            System.out.println("Read from file successfully at " + url);
+            return true;
+        } catch (Exception e) {
+            System.out.println("Error save to file" + e.getMessage());
+            return false;
+        }
+    }
+
+    public boolean saveToFileTxt(String url) {
+        if (hotelList.isEmpty()) {
+            System.out.println("Hotel list is empty");
+            return false;
+        }
+        try {
+            File file = new File(url);
+            if (!file.exists()) {
+                file.createNewFile();
+            }
+            FileWriter fw = new FileWriter(file);
+            BufferedWriter bw = new BufferedWriter(fw);
+            // write file trong mang userActionList
+            for (HotelModel hotel : userActionList) {
+                bw.write(hotel.getHotel_id() + "-" + hotel.getHotel_Name() + "-"
+                        + hotel.getHotel_Room_Available() + "-" + hotel.getHotel_Address() + "-"
+                        + hotel.getHotel_Phone() + "-" + hotel.getHotel_Rating());
+                bw.newLine();
+            }
+            bw.close();
+            fw.close();
+            System.out.println("Save to file successfully at " + url);
+            return true;
+        } catch (Exception e) {
+            System.out.println("Error save to file" + e.getMessage());
             return false;
         }
     }
