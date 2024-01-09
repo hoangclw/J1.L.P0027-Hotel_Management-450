@@ -1,9 +1,6 @@
 package controllers;
 
-import java.io.EOFException;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.ObjectInputStream;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -12,7 +9,6 @@ import constants.Message;
 import constants.Regex;
 import models.HotelModel;
 import utils.ConsoleColors;
-import utils.FileHandler;
 import utils.Inputter;
 import utils.StringTools;
 
@@ -338,7 +334,20 @@ public class HotelManagement {
     }
 
     public boolean saveToFile(String url) {
-        return FileHandler.serialize(url);
+        try {
+            FileOutputStream fOut = new FileOutputStream(url);
+            ObjectOutputStream out = new ObjectOutputStream(fOut);
+            for(HotelModel item: hotelList){
+                out.writeObject(item);
+            }
+            out.close();
+            fOut.close();
+            System.out.println("Serialized data is saved in " + url);
+            return true;
+        } catch (IOException e) {
+            System.out.println("Serialization failed: " + e.getMessage());
+            return false;
+        }
     }
 
     public void quit() {
