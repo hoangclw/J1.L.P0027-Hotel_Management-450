@@ -328,10 +328,23 @@ public class HotelManagement {
             }
             fo.close();
             fi.close();
-            userActionList = new ArrayList<>(hotelList); // copy hotelList to userActionList when load from file
+
+            // fix lại bằng cách dùng deepcopy, khi đó khi ta tác động đến phần tử trong
+            // userActionList
+            // thì phần tử trong hotelList không bị tác động theo
+            userActionList = new ArrayList<>();
+            for (HotelModel item : hotelList) {
+                userActionList
+                        .add(new HotelModel(item.getHotel_id(), item.getHotel_Name(), item.getHotel_Room_Available(),
+                                item.getHotel_Address(), item.getHotel_Phone(), item.getHotel_Rating()));
+            }
+
+            // userActionList = new ArrayList<>(hotelList); // copy hotelList to
+            // userActionList when load from file
             // shallow copy, khi mà copy phần tử như này, nếu ta tác động đến phần tử trong
             // userActionList
             // thì phần tử trong hotelList cũng bị tác động theo
+
             System.out.println("Deserialized data is loaded from " + url);
             return true;
         } catch (Exception e) {
