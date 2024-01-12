@@ -6,5 +6,5 @@ public class Regex {
     public static final String HOTEL_ROOM_AVAILABLE = "^\\d+$"; // number >= 0
     public static final String HOTEL_ADDRESS = "^[a-zA-Z0-9,\\s]+$"; // address
     public static final String HOTEL_PHONE = "^(\\+\\d{1,2}\\s?)?\\(?\\d{3}\\)?[\\s.-]?\\d{3}[\\s.-]?\\d{4}$"; // phone
-    public static final String HOTEL_RATING = "^\\d+\\sstar$"; // 1 star, 2 star, 3 star, ...
+    public static final String HOTEL_RATING = "^\\d+\\sstar[s]?$"; // 1 star, 2 star[s], 3 star[s], ...
 }

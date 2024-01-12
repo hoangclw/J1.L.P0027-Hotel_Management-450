@@ -205,6 +205,7 @@ public class HotelManagement {
                     for (HotelModel item : hotelList) {
                         if (!item.getHotel_Name().equalsIgnoreCase(hotelName)) {
                             System.out.println(Message.HOTEL_NAME_IS_NOT_EXISTED);
+                            break;
                         } else {
                             System.out.println(Message.HOTEL_NAME_IS_EXISTED);
                             item.showInfo();
@@ -240,7 +241,7 @@ public class HotelManagement {
             item.showInfo();
         }
 
-        System.out.println("Test UserActionList: ");
+        System.out.println(ConsoleColors.RED_BACKGROUND + "Test UserActionList: " + ConsoleColors.RESET);
         for (HotelModel item : userActionList) {
             item.showInfo();
         }
@@ -302,7 +303,7 @@ public class HotelManagement {
      * }
      */
 
-    public boolean loadFromFileObj(String url) {
+    public boolean loadFromFile(String url) {
         // hotelList.clear();
         // hotelList = FileHandler.deserialize(url);
         // return hotelList != null;
@@ -317,26 +318,37 @@ public class HotelManagement {
             FileInputStream fi = new FileInputStream(f);
             ObjectInputStream fo = new ObjectInputStream(fi);
             HotelModel hotel;
-            for (HotelModel item : hotelList) {
-                hotel = (HotelModel) fo.readObject();
-                hotelList.add(hotel);
+            try {
+                while (true) {
+                    hotel = (HotelModel) fo.readObject();
+                    hotelList.add(hotel);
+                }
+            } catch (EOFException e) {
+                System.out.println("End of file " + e.getMessage());
             }
             fo.close();
             fi.close();
+            userActionList = new ArrayList<>(hotelList); // copy hotelList to userActionList when load from file
+            // shallow copy, khi mà copy phần tử như này, nếu ta tác động đến phần tử trong
+            // userActionList
+            // thì phần tử trong hotelList cũng bị tác động theo
             System.out.println("Deserialized data is loaded from " + url);
             return true;
         } catch (Exception e) {
-            System.out.println("Error read file" + e.getMessage());
+            System.out.println("Error read file " + e.getMessage());
             return false;
         }
-
     }
 
-    public boolean saveToFileObj(String url) {
+    public boolean saveToFile(String url) {
+        if (hotelList.isEmpty()) {
+            System.out.println("Hotel list is empty");
+            return false;
+        }
         try {
             FileOutputStream fOut = new FileOutputStream(url);
             ObjectOutputStream out = new ObjectOutputStream(fOut);
-            for (HotelModel item : hotelList) {
+            for (HotelModel item : userActionList) {
                 out.writeObject(item);
             }
             out.close();
