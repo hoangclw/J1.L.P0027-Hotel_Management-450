@@ -10,7 +10,7 @@ public class Main {
         HotelManagement hm = new HotelManagement();
 
         // hm.loadFromFile(Path.URL);
-        hm.loadFromFile(Path.URL);
+        hm.readFromFileTxt(Path.URL_TXT);
 
         Menu menu = new Menu("Hotel Management System");
         menu.addNewOption("Adding new hotel");
@@ -46,7 +46,7 @@ public class Main {
                     hm.displayHotelList();
                     break;
                 case 7:
-                    // hm.saveToFile(Path.URL);
+                    hm.saveToFileTxt(Path.URL_TXT);
                     hm.saveToFile(Path.URL);
                     break;
                 case 8:
